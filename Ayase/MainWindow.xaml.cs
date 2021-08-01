@@ -1,4 +1,5 @@
 ﻿using Ayase.AutomationLib;
+using Ayase.IUIAutomationLib;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using UIAutomationClient;
 
 namespace Ayase
 {
@@ -32,10 +34,10 @@ namespace Ayase
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            NativeAPI.GetWindowThreadProcessId(NativeAPI.GetForegroundWindow(), out int processID);
-            AutomationElement window = IAutomationElementManager.GetWindowByProcessID(237760);
+            /*NativeAPI.GetWindowThreadProcessId(NativeAPI.GetForegroundWindow(), out int processID);
+            AutomationElement window = IAutomationManager.GetWindowByProcessID(15204);
             DateTime ts_start = DateTime.UtcNow;
-            ConcurrentQueue<AutomationElement> res = IAutomationElementManager.GetEndElementsByParallel(window, 2);
+            ConcurrentQueue<AutomationElement> res = IAutomationManager.GetEndElementsByParallel(window, 2);
             DateTime ts_end = DateTime.UtcNow;
             MessageBox.Show("thread time spent: " + (ts_end - ts_start).TotalSeconds.ToString() + "sec");
             Debug.WriteLine("count: " + res.Count);
@@ -44,6 +46,20 @@ namespace Ayase
                 Debug.WriteLine("------------------------");
                 Debug.WriteLine("Name: " + res_element.Current.Name);
                 Debug.WriteLine("Rect: " + res_element.Current.BoundingRectangle.ToString());
+                Debug.WriteLine("------------------------");
+                Debug.WriteLine("");
+            }*/
+
+            DateTime ts_start = DateTime.UtcNow;
+            IUIAutomationElement iui_window = IUIAutomationManager.GetWindowByProcessID(15204);
+            ConcurrentQueue<IUIAutomationElement> res = IUIAutomationManager.GetEndElementsByParallel(iui_window, 24);
+            DateTime ts_end = DateTime.UtcNow;
+            MessageBox.Show("thread time spent: " + (ts_end - ts_start).TotalSeconds.ToString() + "sec");
+            foreach (IUIAutomationElement res_element in res)
+            {
+                Debug.WriteLine("------------------------");
+                Debug.WriteLine("Name: " + res_element.GetCurrentPropertyValue(UIA_PropertyIds.UIA_NamePropertyId));
+                Debug.WriteLine("Rect: " + IUIAutomationManager.GetBoundingRectangle(res_element));
                 Debug.WriteLine("------------------------");
                 Debug.WriteLine("");
             }
