@@ -1,9 +1,11 @@
 ﻿using Ayase.AutomationLib;
-using Ayase.IUIAutomationLib;
+using Ayase.ThreadLib;
+using Ayase.Wrapper;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -32,37 +34,9 @@ namespace Ayase
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            /*NativeAPI.GetWindowThreadProcessId(NativeAPI.GetForegroundWindow(), out int processID);
-            AutomationElement window = IAutomationManager.GetWindowByProcessID(15204);
-            DateTime ts_start = DateTime.UtcNow;
-            ConcurrentQueue<AutomationElement> res = IAutomationManager.GetEndElementsByParallel(window, 2);
-            DateTime ts_end = DateTime.UtcNow;
-            MessageBox.Show("thread time spent: " + (ts_end - ts_start).TotalSeconds.ToString() + "sec");
-            Debug.WriteLine("count: " + res.Count);
-            foreach (AutomationElement res_element in res)
-            {
-                Debug.WriteLine("------------------------");
-                Debug.WriteLine("Name: " + res_element.Current.Name);
-                Debug.WriteLine("Rect: " + res_element.Current.BoundingRectangle.ToString());
-                Debug.WriteLine("------------------------");
-                Debug.WriteLine("");
-            }*/
 
-            DateTime ts_start = DateTime.UtcNow;
-            IUIAutomationElement iui_window = IUIAutomationManager.GetWindowByProcessID(15204);
-            ConcurrentQueue<IUIAutomationElement> res = IUIAutomationManager.GetEndElementsByParallel(iui_window, 24);
-            DateTime ts_end = DateTime.UtcNow;
-            MessageBox.Show("thread time spent: " + (ts_end - ts_start).TotalSeconds.ToString() + "sec");
-            foreach (IUIAutomationElement res_element in res)
-            {
-                Debug.WriteLine("------------------------");
-                Debug.WriteLine("Name: " + res_element.GetCurrentPropertyValue(UIA_PropertyIds.UIA_NamePropertyId));
-                Debug.WriteLine("Rect: " + IUIAutomationManager.GetBoundingRectangle(res_element));
-                Debug.WriteLine("------------------------");
-                Debug.WriteLine("");
-            }
         }
     }
 }
