@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ayase": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
