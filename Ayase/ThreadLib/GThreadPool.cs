@@ -10,7 +10,7 @@ namespace Ayase.ThreadLib
     /// by dashton@stackoverflow, ChrisWue@stackoverflow
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class IThreadPool<T> : IDisposable where T : class
+    public class GThreadPool<T> : IDisposable where T : class
     {
         private readonly object _locker = new object();
         private readonly object _idleLocker = new object();
@@ -33,11 +33,11 @@ namespace Ayase.ThreadLib
         public bool Idle;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IThreadPool{T}"/> class.
+        /// Initializes a new instance of the <see cref="GThreadPool{T}"/> class.
         /// </summary>
         /// <param name="workerCount">The worker count.</param>
         /// <param name="dequeueAction">The dequeue action.</param>
-        public IThreadPool(int workerCount, Action<T> dequeueAction)
+        public GThreadPool(int workerCount, Action<T> dequeueAction)
         {
             Idle = true;
             WorkerCount = workerCount;
@@ -110,7 +110,6 @@ namespace Ayase.ThreadLib
             {
                 while (!Idle) Monitor.Wait(_idleLocker);
             }
-            Dispose();
         }
 
 
