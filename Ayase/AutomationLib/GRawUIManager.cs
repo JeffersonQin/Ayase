@@ -21,7 +21,7 @@ namespace Ayase.AutomationLib
 
         public static Rect GetElementBounds(IntPtr hWnd)
         {
-            Win32API.GetWindowRect(hWnd, out Win32API.RECT rect);
+            Win32API.GetWindowRect(hWnd, out RECT rect);
             return new Rect(new Point(rect.Left, rect.Top), new Point(rect.Right, rect.Bottom));
         }
 

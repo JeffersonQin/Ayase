@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,15 +8,6 @@ namespace Ayase.Wrapper
 {
     public class Win32API
     {
-
-        public struct RECT
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
-
         /// <summary>
         /// Get the pointer of foreground window
         /// </summary>
@@ -67,5 +59,37 @@ namespace Ayase.Wrapper
 
         [DllImport("user32.dll")]
         public static extern int GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+
+        [DllImport("user32.dll", EntryPoint = "RegisterHotKey", SetLastError = true)]
+        public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        
+        
+        [DllImport("user32.dll", EntryPoint = "UnregisterHotKey", SetLastError = true)]
+        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(IntPtr hwnd);
+
+        [DllImport("oleacc.dll")]
+        public static extern uint GetRoleText(uint dwRole, [Out] StringBuilder lpszRole, uint cchRoleMax);
+
+        [DllImport("oleacc.dll")]
+        public static extern uint GetStateText(uint dwStateBit, [Out] StringBuilder lpszStateBit, uint cchStateBitMax);
+
+        [DllImport("oleacc.dll")]
+        public static extern uint WindowFromAccessibleObject(IAccessible pacc, ref IntPtr phwnd);
+
+        [DllImport("oleacc.dll", PreserveSig = false)]
+        [return: MarshalAs(UnmanagedType.Interface)]
+        public static extern object AccessibleObjectFromWindow(int hwnd, int dwId, ref Guid riid);
+
+        [DllImport("oleacc.dll")]
+        public static extern int AccessibleObjectFromWindow(IntPtr hwnd, uint id, ref Guid iid, [In, Out, MarshalAs(UnmanagedType.IUnknown)] ref object ppvObject);
+
+        [DllImport("oleacc.dll")]
+        public static extern int AccessibleChildren(IAccessible paccContainer, int iChildStart, int cChildren, [Out()] [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] object[] rgvarChildren, ref int pcObtained);
+
     }
 }
