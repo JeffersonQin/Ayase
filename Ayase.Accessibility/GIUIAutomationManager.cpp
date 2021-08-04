@@ -3,12 +3,12 @@
 #include <combaseapi.h>
 #include <WinUser.h>
 #include <UIAutomation.h>
-#include <iostream>
 
 IUIAutomation* g_pAutomation;
 
 BOOL InitializeUIAutomation() {
-    HRESULT hr = CoInitialize(NULL);
+    HRESULT hr;
+    hr = CoInitialize(NULL);
     if (!SUCCEEDED(hr)) return (SUCCEEDED(hr));
     hr = CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER,
         __uuidof(IUIAutomation), (void**)&g_pAutomation);
@@ -18,7 +18,8 @@ BOOL InitializeUIAutomation() {
 
 HRESULT GetForegroundWindowElement(IUIAutomationElement** foundWindow) {
     IUIAutomationElement* root;
-    HRESULT hr = g_pAutomation->GetRootElement(&root);
+    HRESULT hr;
+    hr = g_pAutomation->GetRootElement(&root);
     if (!SUCCEEDED(hr)) return hr;
     
     HWND hwnd = GetForegroundWindow();
@@ -42,22 +43,82 @@ HRESULT GetForegroundWindowElement(IUIAutomationElement** foundWindow) {
 
 HRESULT GetElementName(IUIAutomationElement* element, BSTR* name) {
     VARIANT varGet;
-    HRESULT hr = element->GetCurrentPropertyValue(UIA_NamePropertyId, &varGet);
+    HRESULT hr;
+    hr = element->GetCurrentPropertyValue(UIA_NamePropertyId, &varGet);
+
+    if (!SUCCEEDED(hr)) { 
+        VariantClear(&varGet);
+        return hr; 
+    }
+    if (varGet.vt != VT_BSTR) { 
+        VariantClear(&varGet);
+        return S_FALSE; 
+    }
+
     *name = varGet.bstrVal;
     VariantClear(&varGet);
     return hr;
 }
 
 
-HRESULT GetElementBounds(IUIAutomationElement* element) {
+HRESULT GetElementBounds(IUIAutomationElement* element, 
+    DOUBLE* x, DOUBLE* y, DOUBLE* w, DOUBLE* h) {
+    VARIANT varGet;
+    HRESULT hr;
+    hr = element->GetCurrentPropertyValue(UIA_BoundingRectanglePropertyId, &varGet);
+    
+    if (!SUCCEEDED(hr)) { 
+        VariantClear(&varGet);
+        return hr; 
+    }
+    if (varGet.vt != (VT_R8 | VT_ARRAY)) { 
+        VariantClear(&varGet); 
+        return S_FALSE; 
+    }
+    SAFEARRAY *psa = varGet.parray;
+    VariantClear(&varGet);
+    if (psa == NULL) return S_FALSE;
 
+    hr = SafeArrayLock(psa);
+    if (!SUCCEEDED(hr)) return hr;
+
+    DOUBLE* pData = static_cast<DOUBLE*>(psa->pvData);
+    *x = pData[0];
+    *y = pData[1];
+    *w = pData[2];
+    *h = pData[3];
+
+    SafeArrayUnlock(psa);
+    return S_OK;
 }
 
 
-wchar_t* GetForeGroundWindowName() {
+HRESULT GetUIElement(IUIAutomationElement* element, GUIElement* result) {
+    HRESULT hr;
+    hr = GetElementName(element, &(result->name));
+    if (!SUCCEEDED(hr)) return hr;
+
+    hr = GetElementBounds(element, &(result->x), &(result->y), &(result->w), &(result->h));
+    return hr;
+}
+
+
+wchar_t* GetForegroundWindowName() {
     IUIAutomationElement* window;
-    GetForegroundWindowElement(&window);
+    HRESULT hr = GetForegroundWindowElement(&window);
+    if (!SUCCEEDED(hr)) return NULL;
+
     BSTR name;
-    GetElementName(window, &name);
+    hr = GetElementName(window, &name);
+    if (!SUCCEEDED(hr)) return NULL;
     return name;
+}
+
+
+GUIElement* test() {
+    IUIAutomationElement* window;
+    HRESULT hr = GetForegroundWindowElement(&window);
+    GUIElement *result = new GUIElement();
+    hr = GetUIElement(window, result);
+    return result;
 }

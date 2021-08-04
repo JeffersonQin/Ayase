@@ -287,11 +287,13 @@
   <ItemGroup>
     <ClInclude Include="GIUIAutomationManager.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GUIElement.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GIUIAutomationManager.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="GUIElement.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Create</PrecompiledHeader>
