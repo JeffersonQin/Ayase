@@ -5,10 +5,13 @@
 #define GIUIAUTOMATIONMANAGER_API __declspec(dllimport)
 #endif
 
+#include <vector>
 #include "GUIElement.h"
 
 extern "C" GIUIAUTOMATIONMANAGER_API int InitializeUIAutomation();
 
-extern "C" GIUIAUTOMATIONMANAGER_API wchar_t* GetForegroundWindowName();
+extern "C" GIUIAUTOMATIONMANAGER_API int GetLeafElementsFromForegroundWindow(std::vector<GUIElement*>** leafElements, int* elementCount);
 
-extern "C" GIUIAUTOMATIONMANAGER_API GUIElement* test();
+extern "C" GIUIAUTOMATIONMANAGER_API int DeleteLeafElements(std::vector<GUIElement*>* leafElements);
+
+extern "C" GIUIAUTOMATIONMANAGER_API int GetGUIElement(std::vector<GUIElement*>* leafElements, int index, GUIElement** element);

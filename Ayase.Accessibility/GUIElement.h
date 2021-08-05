@@ -6,8 +6,8 @@
 #endif
 
 struct GUIElement {
-	double x, y, w, h;
-	wchar_t* name;
+	double x = 0, y = 0, w = 0, h = 0;
+	wchar_t* name = 0;
 };
 
 extern "C" GUIELEMENT_API int GetBoundingRectangle(GUIElement* element, double* x, double* y, double* w, double* h);
