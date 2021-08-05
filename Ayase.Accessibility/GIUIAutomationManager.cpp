@@ -68,6 +68,7 @@ HRESULT GetForegroundWindowElement(IUIAutomationElement** foundWindow) {
 
 
 HRESULT GetElementName(IUIAutomationElement* element, BSTR* name) {
+    if (element == NULL) return E_FAIL;
     VARIANT varGet;
     HRESULT hr;
     hr = element->GetCurrentPropertyValue(UIA_NamePropertyId, &varGet);
@@ -89,6 +90,7 @@ HRESULT GetElementName(IUIAutomationElement* element, BSTR* name) {
 
 HRESULT GetElementBounds(IUIAutomationElement* element, 
     DOUBLE* x, DOUBLE* y, DOUBLE* w, DOUBLE* h) {
+    if (element == NULL) return E_FAIL;
     VARIANT varGet;
     HRESULT hr;
     hr = element->GetCurrentPropertyValue(UIA_BoundingRectanglePropertyId, &varGet);
@@ -120,6 +122,7 @@ HRESULT GetElementBounds(IUIAutomationElement* element,
 
 
 HRESULT GetGUIElement(IUIAutomationElement* element, GUIElement* result) {
+    if (element == NULL) return E_FAIL;
     HRESULT hr;
     hr = GetElementName(element, &(result->name));
     if (!SUCCEEDED(hr)) return hr;
@@ -131,6 +134,7 @@ HRESULT GetGUIElement(IUIAutomationElement* element, GUIElement* result) {
 
 HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>* leafElements, 
     DOUBLE x, DOUBLE y, DOUBLE w, DOUBLE h) {
+    if (element == NULL) return E_FAIL;
     IUIAutomationElementArray* children;
     HRESULT hr;
     hr = element->FindAll(TreeScope_Children, onScreenCondition, &children);
@@ -159,6 +163,7 @@ HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>*
         IUIAutomationElement* child;
         hr = children->GetElement(i, &child);
         if (!SUCCEEDED(hr)) continue;
+        if (child == NULL) continue;
 
         DOUBLE cx = 0, cy = 0, cw = 0, ch = 0;
         hr = GetElementBounds(child, &cx, &cy, &cw, &ch);
@@ -180,6 +185,7 @@ BOOL GetLeafElementsFromForegroundWindow(std::vector<GUIElement*>** leafElements
     HRESULT hr;
     hr = GetForegroundWindowElement(&window);
     if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    if (window == NULL) return SUCCEEDED(E_FAIL);
     
     DOUBLE x = 0, y = 0, w = 0, h = 0;
     hr = GetElementBounds(window, &x, &y, &w, &h);
