@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ayase.Wrapper
+namespace Ayase.AutomationLib.Wrapper
 {
     public class Win32API
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ayase.Wrapper
+namespace Ayase.AutomationLib.Wrapper
 {
     public struct RECT
     {
