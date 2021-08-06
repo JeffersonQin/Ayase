@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ayase.Bridge
+namespace Ayase.AccessibilityBridge
 {
     public static class GNativeIUIAutomationManager
     {
@@ -18,11 +18,5 @@ namespace Ayase.Bridge
 
         [DllImport("../Ayase.Accessibility.dll")]
         public static extern int GetGUIElement(IntPtr leafElements, int index, out IntPtr element);
-
-        [DllImport("../Ayase.Accessibility.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetForegroundWindowName();
-
-        [DllImport("../Ayase.Accessibility.dll")]
-        public static extern IntPtr test();
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ayase.Bridge
+namespace Ayase.AccessibilityBridge
 {
     public static class GNativeUIElement
     {
