@@ -37,7 +37,11 @@ namespace Ayase.UI
 
         public static int UIElementCount = 0;
 
-        public static List<Label> notationLabels;
+        public static List<NotationLabel> notationLabels;
+
+        public static List<int> candidateIndexes;
+
+        public static int focusIndex;
 
         public static void InitializeComponents()
         {
@@ -45,7 +49,8 @@ namespace Ayase.UI
             formMaskWindow = new FormMaskWindow();
             searchWindow = new SearchWindow();
             notificationManager = new NotificationManager();
-            notationLabels = new List<Label>();
+            notationLabels = new List<NotationLabel>();
+            candidateIndexes = new List<int>();
         }
 
         public static void HideWindow(Window window)
@@ -123,6 +128,7 @@ namespace Ayase.UI
         {
             ProcessStopFlag = -1;
             RenderFinishedFlag = 0;
+            focusIndex = -1;
         }
 
         public static void EndProcess()
@@ -143,40 +149,40 @@ namespace Ayase.UI
             UIElementCount = 0;
 
             notationLabels.Clear();
+            candidateIndexes.Clear();
+            focusIndex = -1;
 
             ProcessStopFlag = 0;
         }
 
-        public static Label AddNotationLabel(double x, double y, double w, double h, String Name)
+        public static NotationLabel AddNotationLabel(double x, double y, double w, double h, String Name, int index)
         {
-            Label label = null;
+            NotationLabel label = null;
             formMaskWindow.Dispatcher.Invoke(() => {
-                label = new Label();
-                label.SetValue(Canvas.LeftProperty, x);
-                label.SetValue(Canvas.TopProperty, y);
-                label.Foreground = new SolidColorBrush(Colors.White);
-                label.Background = new SolidColorBrush(Color.FromArgb(100, 69, 179, 232));
-                label.BorderBrush = new SolidColorBrush(Colors.Red);
-                label.VerticalAlignment = VerticalAlignment.Center;
-                label.VerticalContentAlignment = VerticalAlignment.Center;
-                label.HorizontalAlignment = HorizontalAlignment.Center;
-                label.HorizontalContentAlignment = HorizontalAlignment.Center;
-                label.Padding = new Thickness(0);
-                label.Margin = new Thickness(0);
-                label.BorderThickness = new Thickness(1);
-                label.Width = w;
-                label.Height = h;
-                TextBlock tb = new TextBlock();
-                tb.TextWrapping = TextWrapping.Wrap;
-                tb.Text = Name;
-                label.Content = tb;
+                label = new NotationLabel(x, y, w, h, Name);
                 notationLabels.Add(label);
+                candidateIndexes.Add(index);
+                if (index == 0) SetFocus(0);
                 formMaskWindow.Canvas.Dispatcher.Invoke(() =>
                 {
                     formMaskWindow.Canvas.Children.Add(label);
                 }, DispatcherPriority.Render);
             }, DispatcherPriority.Render);
             return label;
+        }
+
+        public static void SetFocus(int index)
+        {
+            if (focusIndex == index) return;
+            if (focusIndex >= 0)
+            {
+                if (candidateIndexes.Contains(focusIndex))
+                    notationLabels[focusIndex].SetStatus(NotationLabelStatus.Candidate);
+                else
+                    notationLabels[focusIndex].SetStatus(NotationLabelStatus.Other);
+            }
+            notationLabels[index].SetStatus(NotationLabelStatus.Focus);
+            focusIndex = index;
         }
 
         public static void FinishRender()

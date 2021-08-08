@@ -151,10 +151,27 @@ namespace Ayase
                     await Task.Run(() =>
                     {
                         #region get elements
+                        int hr;
                         DateTime ts_start, ts_end;
                         ts_start = DateTime.UtcNow;
-                        GNativeIUIAutomationManager.GetLeafElementsFromWindow(foregroundWindow, out IntPtr leafElements, out int elementCount, ref WindowManager.ProcessStopFlag);
+                        hr = GNativeIUIAutomationManager.GetLeafElementsFromWindow(foregroundWindow, out IntPtr leafElements, out int elementCount, ref WindowManager.ProcessStopFlag);
                         ts_end = DateTime.UtcNow;
+
+                        if (hr < 0)
+                        {
+                            new ToastContentBuilder()
+                                .AddText("Getting leaf elements from window failed, exitting...")
+                                .AddText("Fail Code: " + hr).Show();
+                            WindowManager.EndProcess();
+                            return;
+                        }
+
+                        if (elementCount == 0)
+                        {
+                            new ToastContentBuilder().AddText("No UI Element found, exitting...").Show();
+                            WindowManager.EndProcess();
+                            return;
+                        }
 
                         WindowManager.UIElements = leafElements;
                         WindowManager.UIElementCount = elementCount;
@@ -180,20 +197,22 @@ namespace Ayase
                             int index = i;
                             threadPool.EnqueueTask(() =>
                             {
-                                GNativeIUIAutomationManager.GetGUIElement(leafElements, index, out IntPtr element);
-                                GNativeUIElement.GetBoundingRectangle(element, out double ex, out double ey, out double ew, out double eh);
-                                GNativeUIElement.GetName(element, out IntPtr namePointer);
+                                hr = GNativeIUIAutomationManager.GetGUIElement(leafElements, index, out IntPtr element);
+                                if (element == IntPtr.Zero || hr < 0) return;
+                                hr = GNativeUIElement.GetBoundingRectangle(element, out double ex, out double ey, out double ew, out double eh);
+                                if (hr < 0) return;
+                                hr = GNativeUIElement.GetName(element, out IntPtr namePointer);
+                                if (hr < 0) return;
                                 WindowManager.AddNotationLabel(
                                     (ex - x) * 96.0 / PrimaryScreen.DpiX,
                                     (ey - y) * 96.0 / PrimaryScreen.DpiY,
                                     ew * 96.0 / PrimaryScreen.DpiX,
                                     eh * 96.0 / PrimaryScreen.DpiY, 
-                                    Marshal.PtrToStringUni(namePointer));
+                                    Marshal.PtrToStringUni(namePointer), index);
                             });
                         }
-                        #endregion
-
                         WindowManager.FinishRender();
+                        #endregion
                     });
                 }, DispatcherPriority.Loaded);
                 #endregion
