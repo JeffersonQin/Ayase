@@ -1,23 +1,18 @@
 #include "pch.h" // use stdafx.h in Visual Studio 2017 and earlier
 #include "GIUIAutomationManager.h"
-#include <combaseapi.h>
-#include <comdef.h>
-#include <comutil.h>
-#include <WinUser.h>
-#include <UIAutomation.h>
 
 IUIAutomation* g_pAutomation;
 IUIAutomationCondition* onScreenCondition;
 IUIAutomationCondition* isControlCondition;
 IUIAutomationCondition* childrenCondition;
 
-BOOL InitializeUIAutomation() {
+HRESULT InitializeUIAutomation() {
     HRESULT hr;
     hr = CoInitialize(NULL);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    if (!SUCCEEDED(hr)) return hr;
     hr = CoCreateInstance(__uuidof(CUIAutomation), NULL, CLSCTX_INPROC_SERVER,
         __uuidof(IUIAutomation), (void**)&g_pAutomation);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    if (!SUCCEEDED(hr)) return hr;
 
     VARIANT varIsOffScreen;
     VariantInit(&varIsOffScreen);
@@ -25,7 +20,7 @@ BOOL InitializeUIAutomation() {
     varIsOffScreen.boolVal = false;
     hr = g_pAutomation->CreatePropertyCondition(UIA_IsOffscreenPropertyId, varIsOffScreen, &onScreenCondition);
     VariantClear(&varIsOffScreen);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    if (!SUCCEEDED(hr)) return hr;
     
     /*
     VARIANT varIsControl;
@@ -38,10 +33,11 @@ BOOL InitializeUIAutomation() {
 
     hr = g_pAutomation->CreateAndCondition(onScreenCondition, isControlCondition, &childrenCondition);
     */
-    return SUCCEEDED(hr);
+    return hr;
 }
 
 
+// TODO: Modify
 HRESULT GetForegroundWindowElement(IUIAutomationElement** foundWindow) {
     IUIAutomationElement* root;
     HRESULT hr;
@@ -121,19 +117,9 @@ HRESULT GetElementBounds(IUIAutomationElement* element,
 }
 
 
-HRESULT GetGUIElement(IUIAutomationElement* element, GUIElement* result) {
-    if (element == NULL) return E_FAIL;
-    HRESULT hr;
-    hr = GetElementName(element, &(result->name));
-    if (!SUCCEEDED(hr)) return hr;
-
-    hr = GetElementBounds(element, &(result->x), &(result->y), &(result->w), &(result->h));
-    return hr;
-}
-
-
 HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>* leafElements, 
-    DOUBLE x, DOUBLE y, DOUBLE w, DOUBLE h) {
+    DOUBLE x, DOUBLE y, DOUBLE w, DOUBLE h, int* stopFlag) {
+    if (*stopFlag > 0) return E_FAIL;
     if (element == NULL) return E_FAIL;
     IUIAutomationElementArray* children;
     HRESULT hr;
@@ -160,6 +146,8 @@ HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>*
     }
 
     for (int i = 0; i < childrenCount; i++) {
+        if (*stopFlag > 0) return E_FAIL;
+
         IUIAutomationElement* child;
         hr = children->GetElement(i, &child);
         if (!SUCCEEDED(hr)) continue;
@@ -173,43 +161,43 @@ HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>*
         if (ch + cy <= y || cw + cx <= x) continue;
         if (cy >= h + y || cx >= w + x) continue;
 
-        GetLeafElements(child, leafElements, cx, cy, cw, ch);
+        GetLeafElements(child, leafElements, cx, cy, cw, ch, stopFlag);
     }
     return S_OK;
 }
 
 
-BOOL GetLeafElementsFromForegroundWindow(std::vector<GUIElement*>** leafElements, int* elementCount) {
+HRESULT GetLeafElementsFromWindow(IUIAutomationElement* window, std::vector<GUIElement*>** leafElements, int* elementCount, int* stopFlag) {
+    if (window == NULL) return E_FAIL;
+
     std::vector<GUIElement*>* result = new std::vector<GUIElement*>();
-    IUIAutomationElement* window;
-    HRESULT hr;
-    hr = GetForegroundWindowElement(&window);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
-    if (window == NULL) return SUCCEEDED(E_FAIL);
     
+    HRESULT hr;
     DOUBLE x = 0, y = 0, w = 0, h = 0;
     hr = GetElementBounds(window, &x, &y, &w, &h);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    if (!SUCCEEDED(hr)) return hr;
 
-    hr = GetLeafElements(window, result, x, y, w, h);
-    if (!SUCCEEDED(hr)) return SUCCEEDED(hr);
+    hr = GetLeafElements(window, result, x, y, w, h, stopFlag);
+    if (*stopFlag > 0) return E_FAIL;
+    
+    if (!SUCCEEDED(hr)) return hr;
 
     *leafElements = result;
     *elementCount = result->size();
-    return SUCCEEDED(S_OK);
+    return S_OK;
 }
 
 
-BOOL DeleteLeafElements(std::vector<GUIElement*>* leafElements) {
+HRESULT DeleteLeafElements(std::vector<GUIElement*>* leafElements) {
     for (GUIElement* element : *leafElements) {
         delete element;
     }
     delete leafElements;
-    return SUCCEEDED(S_OK);
+    return S_OK;
 }
 
 
-BOOL GetGUIElement(std::vector<GUIElement*>* leafElements, int index, GUIElement** element) {
+HRESULT GetGUIElement(std::vector<GUIElement*>* leafElements, int index, GUIElement** element) {
     *element = (*leafElements)[index];
-    return SUCCEEDED(S_OK);
+    return S_OK;
 }
