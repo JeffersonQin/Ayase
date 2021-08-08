@@ -12,7 +12,6 @@ namespace Ayase.UI
         {
             Closing += Window_Closing;
             StateChanged += Window_StateChanged;
-            KeyDown += Window_KeyDown;
         }
 
         public void Present()
@@ -34,14 +33,6 @@ namespace Ayase.UI
         {
             Hide();
             e.Cancel = true;
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                Hide();
-            }
         }
     }
 }

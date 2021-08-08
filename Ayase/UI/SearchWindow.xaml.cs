@@ -13,13 +13,18 @@ using System.Windows.Shapes;
 namespace Ayase.UI
 {
     /// <summary>
-    /// FormMaskWindow.xaml 的交互逻辑
+    /// SearchWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FormMaskWindow : MaskWindow
+    public partial class SearchWindow : MaskWindow
     {
-        public FormMaskWindow()
+        public SearchWindow()
         {
             InitializeComponent();
+        }
+
+        private void ReuseWindow_Activated(object sender, EventArgs e)
+        {
+            QueryTextBox.Focus();
         }
     }
 }

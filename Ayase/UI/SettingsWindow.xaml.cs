@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,23 +28,42 @@ namespace Ayase.UI
             GNativeIUIAutomationManager.InitializeUIAutomation();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Thread.Sleep(2000);
-            DateTime ts_start, ts_end;
-            ts_start = DateTime.UtcNow;
-            GNativeIUIAutomationManager.GetLeafElementsFromForegroundWindow(out IntPtr leafElements, out int elementCount);
-            ts_end = DateTime.UtcNow;
-            MessageBox.Show("Time Spent: " + (ts_end - ts_start).TotalSeconds.ToString());
-            for (int i = 0; i < elementCount; i ++)
+            await Task.Run(() =>
             {
-                GNativeIUIAutomationManager.GetGUIElement(leafElements, i, out IntPtr element);
-                GNativeUIElement.GetName(element, out IntPtr namePtr);
-                GNativeUIElement.GetBoundingRectangle(element, out double x, out double y, out double w, out double h);
-                Debug.WriteLine("Name: " + Marshal.PtrToStringUni(namePtr));
-                Debug.WriteLine("x: " + x + "; y: " + y + "; w: " + w + "; h: " + h);
-            }
-            GNativeIUIAutomationManager.DeleteLeafElements(leafElements);
+                Thread.Sleep(1000);
+                GNativeIUIAutomationManager.GetForegroundWindowElement(out IntPtr foregroundWindow);
+                DateTime ts_start, ts_end;
+                ts_start = DateTime.UtcNow;
+                GNativeIUIAutomationManager.GetLeafElementsFromWindow
+                    (foregroundWindow, out IntPtr leafElements, out int elementCount, ref WindowManager.ProcessStopFlag);
+                WindowManager.UIElements = leafElements;
+                ts_end = DateTime.UtcNow;
+                if (WindowManager.ProcessStopFlag > 0)
+                {
+                    WindowManager.FinishRender();
+                    return;
+                }
+                //MessageBox.Show("Time Spent: " + (ts_end - ts_start).TotalSeconds.ToString());
+                Debug.WriteLine("element count: " + elementCount);
+                for (int i = 0; i < elementCount; i++)
+                {
+                    Debug.WriteLine("i: " + i);
+                    if (WindowManager.ProcessStopFlag > 0)
+                    {
+                        WindowManager.FinishRender();
+                        return;
+                    }
+                    GNativeIUIAutomationManager.GetGUIElement(leafElements, i, out IntPtr element);
+                    GNativeUIElement.GetName(element, out IntPtr namePtr);
+                    GNativeUIElement.GetBoundingRectangle(element, out double x, out double y, out double w, out double h);
+                    Debug.WriteLine("Name: " + Marshal.PtrToStringUni(namePtr));
+                    Debug.WriteLine("x: " + x + "; y: " + y + "; w: " + w + "; h: " + h);
+                }
+
+                WindowManager.FinishRender();
+            });
         }
     }
 }

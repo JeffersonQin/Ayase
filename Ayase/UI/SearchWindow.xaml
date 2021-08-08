@@ -1,0 +1,23 @@
+﻿<local:MaskWindow x:Class="Ayase.UI.SearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ayase.UI"
+        mc:Ignorable="d"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        Activated="ReuseWindow_Activated"
+        Title="SearchWindow" Width="768" Background="#7F000000">
+    <Border>
+        <Grid>
+            <TextBox x:Name="QueryTextBox" Margin="10,10,10,10"
+                    Visibility="Visible" FontSize="60" Background="#7F491B94" Foreground="White" Grid.ColumnSpan="2">
+            </TextBox>
+        </Grid>
+    </Border>
+</local:MaskWindow>
