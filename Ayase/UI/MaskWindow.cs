@@ -16,7 +16,7 @@ namespace Ayase.UI
             ShowInTaskbar = false;
             ResizeMode = System.Windows.ResizeMode.NoResize;
             Title = "MaskWindow";
-            Background = new SolidColorBrush(Color.FromArgb(82, 0, 0, 0));
+            Background = new SolidColorBrush(Color.FromArgb(40, 0, 0, 0));
             MouseDown += Window_MouseDown;
             KeyDown += Window_KeyDown;
         }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Ayase.UI" 
         xmlns:notifications="clr-namespace:Notifications.Wpf.Controls;assembly=Notifications.Wpf"
         mc:Ignorable="d"
-        BorderThickness="3,3,3,3" 
+        BorderThickness="3,3,3,3"
         BorderBrush="Red" 
         Topmost="True">
     <Canvas x:Name="ParentCanvas">

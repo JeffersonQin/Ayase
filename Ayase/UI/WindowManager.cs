@@ -101,10 +101,11 @@ namespace Ayase.UI
         {
             formMaskWindow.Dispatcher.InvokeAsync(() =>
             {
-                formMaskWindow.Top = y;
-                formMaskWindow.Left = x;
-                formMaskWindow.Width = w;
-                formMaskWindow.Height = h;
+                // Magic number 3: the border of formMaskWindow
+                formMaskWindow.Top = y - 3;
+                formMaskWindow.Left = x - 3;
+                formMaskWindow.Width = w + 3 * 2;
+                formMaskWindow.Height = h + 3 * 2;
                 formMaskWindow.FormNotificationArea.Position = NotificationPosition.BottomRight;
                 formMaskWindow.FormNotificationArea.MaxItems = 10;
                 formMaskWindow.Canvas.SetValue(Canvas.LeftProperty, 0.0);

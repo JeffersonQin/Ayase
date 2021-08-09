@@ -49,7 +49,7 @@ namespace Ayase.UI
                     break;
                 case NotationLabelStatus.Other:
                     Foreground = new SolidColorBrush(Colors.White);
-                    Background = new SolidColorBrush(Color.FromArgb(100, 69, 179, 232));
+                    Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
                     break;
             }
         }

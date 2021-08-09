@@ -20,6 +20,7 @@ namespace Ayase.UI
         public FormMaskWindow()
         {
             InitializeComponent();
+            Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         }
     }
 }
