@@ -6,6 +6,8 @@ IUIAutomationCondition* onScreenCondition;
 IUIAutomationCondition* isControlCondition;
 IUIAutomationCondition* childrenCondition;
 
+double windowArea = 0;
+
 HRESULT InitializeUIAutomation() {
     HRESULT hr;
     hr = CoInitialize(NULL);
@@ -141,6 +143,10 @@ HRESULT GetLeafElements(IUIAutomationElement* element, std::vector<GUIElement*>*
             delete resElement;
             return hr;
         }
+        if (w * h > 0.9 * windowArea && !wcscmp(resElement->name, L"")) {
+            delete resElement;
+            return S_OK;
+        }
         leafElements->push_back(resElement);
         return S_OK;
     }
@@ -177,6 +183,7 @@ HRESULT GetLeafElementsFromWindow(IUIAutomationElement* window, std::vector<GUIE
     hr = GetElementBounds(window, &x, &y, &w, &h);
     if (!SUCCEEDED(hr)) return hr;
 
+    windowArea = w * h;
     hr = GetLeafElements(window, result, x, y, w, h, stopFlag);
     if (*stopFlag > 0) return E_FAIL;
     
