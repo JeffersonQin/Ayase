@@ -6,6 +6,7 @@
 #endif
 
 #include <vector>
+#include <algorithm>
 #include "GUIElement.h"
 #include <combaseapi.h>
 #include <comdef.h>

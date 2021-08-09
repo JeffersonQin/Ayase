@@ -1,0 +1,2 @@
+#pragma once
+#define GUIELEMENT_COMPARE_DISTANCE_Y_THRESHOLD 5

@@ -189,6 +189,8 @@ HRESULT GetLeafElementsFromWindow(IUIAutomationElement* window, std::vector<GUIE
     
     if (!SUCCEEDED(hr)) return hr;
 
+    std::sort(result->begin(), result->end(), Compare);
+
     *leafElements = result;
     *elementCount = result->size();
     return S_OK;
