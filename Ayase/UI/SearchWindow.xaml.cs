@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ayase.AccessibilityBridge;
+using Ayase.MouseLib;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -32,15 +34,37 @@ namespace Ayase.UI
 
         private void QueryTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Tab)
+            new Thread(() =>
             {
-                if (!ShiftModifier) WindowManager.SetFocusNext();
-                else WindowManager.SetFocusPrevious();
-            }
-            else if (e.Key == Key.Escape)
-                new Thread(() => { WindowManager.EndProcess(); }).Start();
-            else if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
-                ShiftModifier = true;
+                if (e.Key == Key.Tab)
+                {
+                    if (!ShiftModifier) WindowManager.SetFocusNext();
+                    else WindowManager.SetFocusPrevious();
+                }
+                else if (e.Key == Key.Escape)
+                    WindowManager.EndProcess();
+                else if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+                    ShiftModifier = true;
+                else if (e.Key == Key.Enter)
+                {
+                    if (WindowManager.focusIndex < 0 || WindowManager.ProcessStopFlag != -1 || WindowManager.RenderFinishedFlag != 1) return;
+                    GNativeIUIAutomationManager.GetGUIElement(WindowManager.UIElements, WindowManager.focusIndex, out IntPtr element);
+                    GNativeUIElement.GetBoundingRectangle(element, out double x, out double y, out double w, out double h);
+                    int pos_x = (int)(x + 0.5 * w);
+                    int pos_y = (int)(y + 0.5 * h);
+                    GMouse.SetCursorPos(pos_x, pos_y);
+
+                    WindowManager.EndProcess();
+
+                    if (!ShiftModifier)
+                    {
+                        Thread.Sleep(20);
+                        GMouse.mouse_event(GMouse.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                        Thread.Sleep(20);
+                        GMouse.mouse_event(GMouse.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                    }
+                }
+            }).Start();
         }
 
         private void QueryTextBox_KeyUp(object sender, KeyEventArgs e)

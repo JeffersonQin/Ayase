@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Ayase.UI
 {
@@ -36,22 +37,25 @@ namespace Ayase.UI
 
         public void SetStatus(NotationLabelStatus Status)
         {
-            this.Status = Status;
-            switch (Status)
+            Dispatcher.Invoke(() =>
             {
-                case NotationLabelStatus.Candidate:
-                    Foreground = new SolidColorBrush(Colors.Red);
-                    Background = new SolidColorBrush(Color.FromArgb(100, 0, 77, 230));
-                    break;
-                case NotationLabelStatus.Focus:
-                    Foreground = new SolidColorBrush(Colors.Red);
-                    Background = new SolidColorBrush(Color.FromArgb(100, 255, 226, 104));
-                    break;
-                case NotationLabelStatus.Other:
-                    Foreground = new SolidColorBrush(Colors.White);
-                    Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-                    break;
-            }
+                this.Status = Status;
+                switch (Status)
+                {
+                    case NotationLabelStatus.Candidate:
+                        Foreground = new SolidColorBrush(Colors.Red);
+                        Background = new SolidColorBrush(Color.FromArgb(100, 0, 77, 230));
+                        break;
+                    case NotationLabelStatus.Focus:
+                        Foreground = new SolidColorBrush(Colors.Red);
+                        Background = new SolidColorBrush(Color.FromArgb(100, 255, 226, 104));
+                        break;
+                    case NotationLabelStatus.Other:
+                        Foreground = new SolidColorBrush(Colors.White);
+                        Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                        break;
+                }
+            }, DispatcherPriority.Render);
         }
     }
 

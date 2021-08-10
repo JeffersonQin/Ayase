@@ -155,6 +155,12 @@ namespace Ayase.UI
             {
                 formMaskWindow.Canvas.Children.Clear();
             }, DispatcherPriority.Render);
+
+            searchWindow.Dispatcher.Invoke(() =>
+            {
+                searchWindow.QueryTextBox.SelectAll();
+            }, DispatcherPriority.Render);
+            
             HideFormMask();
             HideScreenMask();
             HideSearchWindow();
