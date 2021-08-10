@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using ToolGood.Words;
 
 namespace Ayase
 {
@@ -175,7 +176,9 @@ namespace Ayase
 
                         WindowManager.UIElements = leafElements;
                         WindowManager.UIElementCount = elementCount;
-                        WindowManager.notificationManager.Show(
+                        WindowManager.formMaskWindow.FormNotificationArea.Dispatcher.Invoke(() =>
+                        {
+                            WindowManager.notificationManager.Show(
                             new NotificationContent
                             {
                                 Title = "UI Analyzation Completed",
@@ -183,6 +186,7 @@ namespace Ayase
                                 Type = NotificationType.Success
                             }, areaName: "FormNotificationArea"
                         );
+                        }, DispatcherPriority.Render);
                         
                         if (WindowManager.ProcessStopFlag > 0)
                         {
@@ -203,14 +207,31 @@ namespace Ayase
                                 if (hr < 0) return;
                                 hr = GNativeUIElement.GetName(element, out IntPtr namePointer);
                                 if (hr < 0) return;
+                                string name = Marshal.PtrToStringUni(namePointer);
+                                lock (WindowManager.MatchStringsLocker)
+                                {
+                                    WindowManager.MatchStrings.Add(index, new List<string>());
+                                    WindowManager.MatchStrings[index].Add(name.ToLower());
+                                    if (WordsHelper.HasChinese(name))
+                                    {
+                                        WindowManager.MatchStrings[index].Add(WordsHelper.GetPinyin(name).ToLower());
+                                        WindowManager.MatchStrings[index].Add(WordsHelper.GetFirstPinyin(name).ToLower());
+                                    }
+                                }
                                 WindowManager.AddNotationLabel(
                                     (ex - x) * 96.0 / PrimaryScreen.DpiX,
                                     (ey - y) * 96.0 / PrimaryScreen.DpiY,
                                     ew * 96.0 / PrimaryScreen.DpiX,
                                     eh * 96.0 / PrimaryScreen.DpiY, 
-                                    Marshal.PtrToStringUni(namePointer), index);
+                                    name, index);
                             });
                         }
+                        threadPool.Join();
+                        WindowManager.candidateIndexes.Sort();
+                        WindowManager.searchWindow.Dispatcher.Invoke(() =>
+                        {
+                            WindowManager.searchWindow.QueryTextBox_TextChanged(this, null);
+                        }, DispatcherPriority.Send);
                         WindowManager.FinishRender();
                         #endregion
                     });

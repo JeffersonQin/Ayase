@@ -11,12 +11,15 @@
         ShowInTaskbar="False"
         SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
-        Activated="ReuseWindow_Activated"
+        Activated="MaskWindow_Activated"
         Title="SearchWindow" Width="768" Background="#7F000000">
     <Border>
         <Grid>
             <TextBox x:Name="QueryTextBox" Margin="10,10,10,10"
-                    Visibility="Visible" FontSize="60" Background="#7F491B94" Foreground="White" Grid.ColumnSpan="2">
+                     KeyDown="QueryTextBox_KeyDown"
+                     KeyUp="QueryTextBox_KeyUp"
+                     TextChanged="QueryTextBox_TextChanged"
+                     Visibility="Visible" FontSize="60" Background="#7F491B94" Foreground="White" Grid.ColumnSpan="2">
             </TextBox>
         </Grid>
     </Border>

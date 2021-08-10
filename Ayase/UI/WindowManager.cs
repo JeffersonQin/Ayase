@@ -37,11 +37,15 @@ namespace Ayase.UI
 
         public static int UIElementCount = 0;
 
-        public static List<NotationLabel> notationLabels;
+        public static Dictionary<int, NotationLabel> notationLabels;
 
         public static List<int> candidateIndexes;
 
         public static int focusIndex;
+
+        public static Dictionary<int, List<string>> MatchStrings;
+
+        public static object MatchStringsLocker = new object();
 
         public static void InitializeComponents()
         {
@@ -49,10 +53,12 @@ namespace Ayase.UI
             formMaskWindow = new FormMaskWindow();
             searchWindow = new SearchWindow();
             notificationManager = new NotificationManager();
-            notationLabels = new List<NotationLabel>();
+            notationLabels = new Dictionary<int, NotationLabel>();
             candidateIndexes = new List<int>();
+            MatchStrings = new Dictionary<int, List<string>>();
         }
 
+        #region base function: hide & present
         public static void HideWindow(Window window)
         {
             window.Dispatcher.InvokeAsync(() =>
@@ -69,7 +75,9 @@ namespace Ayase.UI
                 window.Activate();
             }, DispatcherPriority.Render);
         }
+        #endregion
 
+        #region wrapped hide & present
         public static void HideScreenMask()
         {
             HideWindow(screenMaskWindow);
@@ -124,7 +132,9 @@ namespace Ayase.UI
         {
             PresentWindow(searchWindow);
         }
+        #endregion
 
+        #region start & end process
         public static void StartProcess()
         {
             ProcessStopFlag = -1;
@@ -134,6 +144,9 @@ namespace Ayase.UI
 
         public static void EndProcess()
         {
+            if (ProcessStopFlag == 1) return;
+            else ProcessStopFlag = 1;
+
             formMaskWindow.Dispatcher.Invoke(() =>
             {
                 formMaskWindow.Canvas.Children.Clear();
@@ -142,7 +155,6 @@ namespace Ayase.UI
             HideScreenMask();
             HideSearchWindow();
 
-            ProcessStopFlag = 1;
             while (RenderFinishedFlag == 0) Thread.Sleep(10);
 
             if (UIElements != IntPtr.Zero) GNativeIUIAutomationManager.DeleteLeafElements(UIElements);
@@ -152,8 +164,15 @@ namespace Ayase.UI
             notationLabels.Clear();
             candidateIndexes.Clear();
             focusIndex = -1;
+            MatchStrings.Clear();
 
             ProcessStopFlag = 0;
+        }
+        #endregion
+
+        public static void FinishRender()
+        {
+            RenderFinishedFlag = 1;
         }
 
         public static NotationLabel AddNotationLabel(double x, double y, double w, double h, String Name, int index)
@@ -161,8 +180,8 @@ namespace Ayase.UI
             NotationLabel label = null;
             formMaskWindow.Dispatcher.Invoke(() => {
                 label = new NotationLabel(x, y, w, h, Name);
-                notationLabels.Add(label);
                 candidateIndexes.Add(index);
+                notationLabels[index] = label;
                 if (index == 0) SetFocus(0);
                 formMaskWindow.Canvas.Dispatcher.Invoke(() =>
                 {
@@ -174,7 +193,6 @@ namespace Ayase.UI
 
         public static void SetFocus(int index)
         {
-            if (focusIndex == index) return;
             if (focusIndex >= 0)
             {
                 if (candidateIndexes.Contains(focusIndex))
@@ -182,18 +200,32 @@ namespace Ayase.UI
                 else
                     notationLabels[focusIndex].SetStatus(NotationLabelStatus.Other);
             }
-            notationLabels[index].SetStatus(NotationLabelStatus.Focus);
             focusIndex = index;
+            if (index >= 0)
+                notationLabels[index].SetStatus(NotationLabelStatus.Focus);
         }
 
-        public static void FinishRender()
+        public static void SetFocusNext()
         {
-            RenderFinishedFlag = 1;
+            if (UIElementCount > 0 && focusIndex >= 0)
+                SetFocus(candidateIndexes[(candidateIndexes.IndexOf(focusIndex) + 1) % candidateIndexes.Count]);
+        }
+
+        public static void SetFocusPrevious()
+        {
+            if (UIElementCount > 0 && focusIndex >= 0)
+            {
+                int candidateIndex = candidateIndexes.IndexOf(focusIndex);
+                if (candidateIndex > 0)
+                    SetFocus(candidateIndexes[candidateIndex - 1]);
+                else
+                    SetFocus(candidateIndexes[^1]);
+            }
         }
 
         public static void FocusSearch()
         {
-            
+            PresentSearchWindow();
         }
     }
 }

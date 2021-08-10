@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         BorderThickness="3,3,3,3"
         BorderBrush="Red" 
+        Activated="MaskWindow_Activated"
         Topmost="True">
     <Canvas x:Name="ParentCanvas">
         <Canvas x:Name="Canvas" Panel.ZIndex="0"/>

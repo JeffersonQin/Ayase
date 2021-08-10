@@ -21,5 +21,10 @@ namespace Ayase.UI
         {
             InitializeComponent();
         }
+
+        private void MaskWindow_Activated(object sender, EventArgs e)
+        {
+            WindowManager.FocusSearch();
+        }
     }
 }

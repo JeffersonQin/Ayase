@@ -66,6 +66,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.0.2" />
     <PackageReference Include="Notifications.Wpf" Version="0.1.1" />
+    <PackageReference Include="ToolGood.Words" Version="3.0.2.6" />
   </ItemGroup>
 
 </Project>

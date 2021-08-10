@@ -22,5 +22,10 @@ namespace Ayase.UI
             InitializeComponent();
             Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         }
+
+        private void MaskWindow_Activated(object sender, EventArgs e)
+        {
+            WindowManager.FocusSearch();
+        }
     }
 }
