@@ -93,6 +93,10 @@ namespace Ayase
             #region initialize window manager
             WindowManager.InitializeComponents();
             #endregion
+
+            #region load pinyin
+            _ = WordsHelper.GetPinyin("中文测试");
+            #endregion
         }
 
 
@@ -163,6 +167,7 @@ namespace Ayase
                             new ToastContentBuilder()
                                 .AddText("Getting leaf elements from window failed, exitting...")
                                 .AddText("Fail Code: " + hr).Show();
+                            WindowManager.FinishRender();
                             WindowManager.EndProcess();
                             return;
                         }
@@ -170,6 +175,7 @@ namespace Ayase
                         if (elementCount == 0)
                         {
                             new ToastContentBuilder().AddText("No UI Element found, exitting...").Show();
+                            WindowManager.FinishRender();
                             WindowManager.EndProcess();
                             return;
                         }
@@ -218,20 +224,25 @@ namespace Ayase
                                         WindowManager.MatchStrings[index].Add(WordsHelper.GetFirstPinyin(name).ToLower());
                                     }
                                 }
+                                object locker = new object();
                                 WindowManager.AddNotationLabel(
                                     (ex - x) * 96.0 / PrimaryScreen.DpiX,
                                     (ey - y) * 96.0 / PrimaryScreen.DpiY,
                                     ew * 96.0 / PrimaryScreen.DpiX,
                                     eh * 96.0 / PrimaryScreen.DpiY, 
-                                    name, index);
+                                    name, index, ref locker);
+                                _ = locker;
                             });
                         }
                         threadPool.Join();
-                        WindowManager.candidateIndexes.Sort();
+                        lock (WindowManager.candidateIndexesLocker)
+                        {
+                            WindowManager.candidateIndexes.Sort();
+                        }
                         WindowManager.searchWindow.Dispatcher.Invoke(() =>
                         {
                             WindowManager.searchWindow.QueryTextBox_TextChanged(this, null);
-                        }, DispatcherPriority.Send);
+                        }, DispatcherPriority.Render);
                         WindowManager.FinishRender();
                         #endregion
                     });

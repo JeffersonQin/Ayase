@@ -39,7 +39,11 @@ namespace Ayase.UI
 
         public static Dictionary<int, NotationLabel> notationLabels;
 
+        public static object notationLabelsLocker = new object();
+
         public static List<int> candidateIndexes;
+
+        public static object candidateIndexesLocker = new object();
 
         public static int focusIndex;
 
@@ -161,11 +165,20 @@ namespace Ayase.UI
             UIElements = IntPtr.Zero;
             UIElementCount = 0;
 
-            notationLabels.Clear();
-            candidateIndexes.Clear();
-            focusIndex = -1;
-            MatchStrings.Clear();
+            lock (notationLabelsLocker)
+            {
+                notationLabels.Clear();
+            }
+            lock (candidateIndexesLocker)
+            {
+                candidateIndexes.Clear();
+            }
+            lock (MatchStringsLocker)
+            {
+                MatchStrings.Clear();
+            }
 
+            focusIndex = -1;
             ProcessStopFlag = 0;
         }
         #endregion
@@ -175,51 +188,71 @@ namespace Ayase.UI
             RenderFinishedFlag = 1;
         }
 
-        public static NotationLabel AddNotationLabel(double x, double y, double w, double h, String Name, int index)
+        public static void AddNotationLabel(double x, double y, double w, double h, String Name, int index, ref object locker)
         {
-            NotationLabel label = null;
-            formMaskWindow.Dispatcher.Invoke(() => {
-                label = new NotationLabel(x, y, w, h, Name);
-                candidateIndexes.Add(index);
-                notationLabels[index] = label;
-                if (index == 0) SetFocus(0);
-                formMaskWindow.Canvas.Dispatcher.Invoke(() =>
+            lock (locker)
+            {
+                formMaskWindow.Dispatcher.Invoke(() =>
                 {
-                    formMaskWindow.Canvas.Children.Add(label);
+                    NotationLabel label = new NotationLabel(x, y, w, h, Name);
+                    lock (candidateIndexesLocker)
+                    {
+                        candidateIndexes.Add(index);
+                    }
+                    lock (notationLabelsLocker)
+                    {
+                        notationLabels[index] = label;
+                    }
+                    if (index == 0) SetFocus(0);
+                    formMaskWindow.Canvas.Dispatcher.Invoke(() =>
+                    {
+                        formMaskWindow.Canvas.Children.Add(label);
+                    }, DispatcherPriority.Render);
                 }, DispatcherPriority.Render);
-            }, DispatcherPriority.Render);
-            return label;
+            }
         }
 
         public static void SetFocus(int index)
         {
-            if (focusIndex >= 0)
+            lock (notationLabelsLocker)
             {
-                if (candidateIndexes.Contains(focusIndex))
-                    notationLabels[focusIndex].SetStatus(NotationLabelStatus.Candidate);
-                else
-                    notationLabels[focusIndex].SetStatus(NotationLabelStatus.Other);
+                if (focusIndex >= 0)
+                {
+                    lock (candidateIndexesLocker)
+                    {
+                        if (candidateIndexes.Contains(focusIndex))
+                            notationLabels[focusIndex].SetStatus(NotationLabelStatus.Candidate);
+                        else
+                            notationLabels[focusIndex].SetStatus(NotationLabelStatus.Other);
+                    }
+                }
+                focusIndex = index;
+                if (index >= 0)
+                    notationLabels[index].SetStatus(NotationLabelStatus.Focus);
             }
-            focusIndex = index;
-            if (index >= 0)
-                notationLabels[index].SetStatus(NotationLabelStatus.Focus);
         }
 
         public static void SetFocusNext()
         {
-            if (UIElementCount > 0 && focusIndex >= 0)
-                SetFocus(candidateIndexes[(candidateIndexes.IndexOf(focusIndex) + 1) % candidateIndexes.Count]);
+            lock (candidateIndexesLocker)
+            {
+                if (UIElementCount > 0 && focusIndex >= 0)
+                    SetFocus(candidateIndexes[(candidateIndexes.IndexOf(focusIndex) + 1) % candidateIndexes.Count]);
+            }
         }
 
         public static void SetFocusPrevious()
         {
             if (UIElementCount > 0 && focusIndex >= 0)
             {
-                int candidateIndex = candidateIndexes.IndexOf(focusIndex);
-                if (candidateIndex > 0)
-                    SetFocus(candidateIndexes[candidateIndex - 1]);
-                else
-                    SetFocus(candidateIndexes[^1]);
+                lock (candidateIndexesLocker)
+                {
+                    int candidateIndex = candidateIndexes.IndexOf(focusIndex);
+                    if (candidateIndex > 0)
+                        SetFocus(candidateIndexes[candidateIndex - 1]);
+                    else
+                        SetFocus(candidateIndexes[^1]);
+                }
             }
         }
 

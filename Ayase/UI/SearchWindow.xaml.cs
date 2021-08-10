@@ -51,31 +51,47 @@ namespace Ayase.UI
 
         public void QueryTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            WindowManager.candidateIndexes.Clear();
-            string query = QueryTextBox.Text.ToLower();
-            for (int i = 0; i < WindowManager.UIElementCount; i++)
-                if (WindowManager.MatchStrings.TryGetValue(i, out List<string> names))
-                {
-                    bool flagContains = false;
-                    foreach (var name in names)
-                        if (name.Contains(query))
-                        {
-                            flagContains = true;
-                            break;
-                        }
-                    if (flagContains)
+            lock (WindowManager.candidateIndexesLocker)
+            {
+                WindowManager.candidateIndexes.Clear();
+                string query = QueryTextBox.Text.ToLower();
+                for (int i = 0; i < WindowManager.UIElementCount; i++)
+                    lock (WindowManager.MatchStringsLocker)
                     {
-                        WindowManager.candidateIndexes.Add(i);
-                        WindowManager.notationLabels[i].SetStatus(NotationLabelStatus.Candidate);
-                    } else WindowManager.notationLabels[i].SetStatus(NotationLabelStatus.Other);
+                        if (WindowManager.MatchStrings.TryGetValue(i, out List<string> names))
+                        {
+                            bool flagContains = false;
+                            foreach (var name in names)
+                                if (name.Contains(query))
+                                {
+                                    flagContains = true;
+                                    break;
+                                }
+                            lock (WindowManager.notationLabelsLocker)
+                            {
+                                if (flagContains)
+                                {
+                                    WindowManager.candidateIndexes.Add(i);
+                                    WindowManager.notationLabels[i].SetStatus(NotationLabelStatus.Candidate);
+                                }
+                                else WindowManager.notationLabels[i].SetStatus(NotationLabelStatus.Other);
+                            }
+                        }
+                    }
+                WindowManager.candidateIndexes.Sort();
+                if (WindowManager.candidateIndexes.Contains(WindowManager.focusIndex))
+                {
+                    WindowManager.SetFocus(WindowManager.focusIndex);
                 }
-            WindowManager.candidateIndexes.Sort();
-            if (WindowManager.candidateIndexes.Contains(WindowManager.focusIndex))
-                WindowManager.SetFocus(WindowManager.focusIndex);
-            else if (WindowManager.candidateIndexes.Count > 0)
-                WindowManager.SetFocus(WindowManager.candidateIndexes[0]);
-            else
-                WindowManager.SetFocus(-1);
+                else if (WindowManager.candidateIndexes.Count > 0)
+                {
+                    WindowManager.SetFocus(WindowManager.candidateIndexes[0]);
+                }
+                else
+                {
+                    WindowManager.SetFocus(-1);
+                }
+            }
         }
     }
 }
