@@ -63,6 +63,7 @@ namespace Ayase.UI
                         Thread.Sleep(20);
                         GMouse.mouse_event(GMouse.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
                     }
+                    else ShiftModifier = false;
                 }
             }).Start();
         }
