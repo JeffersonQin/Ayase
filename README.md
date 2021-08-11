@@ -34,7 +34,7 @@ For the discussion on accessibility development and speed optimization, please r
 
 Note that I do not have additional time and effort to translate those articles into English. Using translators can also understand the articles well. If you still have any questions or advice, you can contact me directly. You can find ways to contact me in my GitHub homepage. This is the first time I write `WPF / C#` this formally, so if you have any advice, please don't hesitate to raise issues or pull requests.
 
-# About Program Structure
+# Project Structure
 
 ```
 .
