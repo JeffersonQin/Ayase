@@ -4,6 +4,16 @@
 
 Ayase is a tool which can help you to control everything by keyboard. This is specifically designed for ~~lazy people like me~~ and blind people. It is known to all that in the most cases, we have to control the computer by **both** mouse **and** keyboard. However, the frequent switch for our hand between mice and keyboards would severely threaten the health of our wrists. Meanwhile, for blind people, though in most cases, it is convenient enough to use the screen readers to control elements on screen, most softwares cannot control both precisely and **swiftly**. You have to wait for the element or switch many times to find the element you want to control. With Ayase, these problems are all solved.
 
+# Screenshots
+
+Use Ayase to control Netease Music UWP:
+
+![netease-demo](imgs/netease-music.gif)
+
+Use Ayase to surf on the Internet:
+
+![surf-internet-demo](imgs/surf-internet.gif)
+
 # About Naming (Ayase)
 
 I love Mitsukasa Ayase forever!
@@ -115,16 +125,6 @@ The TOC for generated project:
 - `Microsoft.Toolkit.Uwp.Notifications`
 - `Notifications.Wpf`
 - `ToolGood.Words`
-
-# Screenshots
-
-Use Ayase to control Netease Music UWP:
-
-![netease-demo](imgs/netease-music.gif)
-
-Use Ayase to surf on the Internet:
-
-![surf-internet-demo](imgs/surf-internet.gif)
 
 # Usage
 

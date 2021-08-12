@@ -2,6 +2,16 @@
 
 Ayase是一款旨在使用键盘对电脑进行控制的软件。其专门为~~像我这样的懒人~~, 盲人打造。众所周知，在普通情况下，我们需要同时使用键盘**和**鼠标对电脑进行控制，然而频繁的键盘与鼠标间的切换回让人身心俱疲，同时使得手腕关节持续疲劳，有害于人的身体健康。同时，对于盲人朋友们，使用屏幕阅读器固然可以很好地使用电脑，然而大多数情况下其却不能“指哪打哪”，即不能对目标控件进行即刻控制，大多情况下需要等待或快进到需要控制的元素，而Ayase可以通过搜索的方式精确定位，快速控制。
 
+# 截图
+
+使用Ayase操作网易云音乐UWP：
+
+![netease-demo](imgs/netease-music.gif)
+
+使用Ayase网上冲浪：
+
+![surf-internet-demo](imgs/surf-internet.gif)
+
 # 关于命名
 
 我永远喜欢三司~~零奶~~（绫濑）
@@ -113,16 +123,6 @@ https://zh.moegirl.org.cn/三司绫濑
 - `Microsoft.Toolkit.Uwp.Notifications`
 - `Notifications.Wpf`
 - `ToolGood.Words`
-
-# 截图
-
-使用Ayase操作网易云音乐UWP：
-
-![netease-demo](imgs/netease-music.gif)
-
-使用Ayase网上冲浪：
-
-![surf-internet-demo](imgs/surf-internet.gif)
 
 # 使用方法
 
