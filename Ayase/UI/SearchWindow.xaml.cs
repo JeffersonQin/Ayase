@@ -38,8 +38,11 @@ namespace Ayase.UI
             {
                 if (e.Key == Key.Tab)
                 {
-                    if (!ShiftModifier) WindowManager.SetFocusNext();
-                    else WindowManager.SetFocusPrevious();
+                    lock (WindowManager.candidateIndexesLocker)
+                    {
+                        if (!ShiftModifier) WindowManager.SetFocusNext();
+                        else WindowManager.SetFocusPrevious();
+                    }
                 }
                 else if (e.Key == Key.Escape)
                     WindowManager.EndProcess();
