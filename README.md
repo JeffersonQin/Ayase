@@ -137,6 +137,8 @@ The TOC for generated project:
 
 # TODO
 
+Note: most modules have been completed but not released here due to license issues. I am now making effort to crafting new alternatives that are compatible with MIT license.
+
 - Add voice module
 - Add settings module
 - Add support for control by `AWSD`
